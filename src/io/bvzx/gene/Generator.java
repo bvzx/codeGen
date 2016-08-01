@@ -13,6 +13,6 @@ public interface Generator {
 
     String getPath();
 
-
+    void setPath(String path);
 
 }

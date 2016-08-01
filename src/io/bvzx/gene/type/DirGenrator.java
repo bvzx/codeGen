@@ -4,6 +4,7 @@ import io.bvzx.gene.Generator;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by lss on 16-7-29.
@@ -16,6 +17,13 @@ public class DirGenrator implements Generator {
 
     private List<Generator> generatorList;
 
+    public static DirGenrator newIntance(){
+        return new DirGenrator();
+    }
+
+    private DirGenrator() {
+    }
+
     public DirGenrator(String dirName, String dir, List<Generator> generatorList) {
         this.dirName = dirName;
         this.dirPath = dir;
@@ -26,12 +34,27 @@ public class DirGenrator implements Generator {
         this(dirName, dir, null);
     }
 
+    public boolean checkParameters(){
+        Objects.requireNonNull(dirName);
+        Objects.requireNonNull(dirPath);
+        return true;
+    }
+
     @Override
     public void generate() {
+        checkParameters();
+
         File f = new File(dirPath + File.separator + dirName);
         if (!f.exists()) {
             f.mkdirs();
         }
+
+        generatorList.forEach((val)->{
+            if (val.getPath()==null&&val.getPath().equals("")){
+                val.setPath(dirPath+dirName);
+            }
+            val.generate();
+        });
     }
 
     @Override
@@ -42,6 +65,11 @@ public class DirGenrator implements Generator {
     @Override
     public String getPath() {
         return dirPath;
+    }
+
+    @Override
+    public void setPath(String path) {
+         this.dirPath=path;
     }
 
     public String getDirName() {

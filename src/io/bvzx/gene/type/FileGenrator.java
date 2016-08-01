@@ -31,6 +31,11 @@ public class FileGenrator implements Generator {
         this.templateFilePath = templateFilePath;
     }
 
+    public FileGenrator(String fileName, String templateFilePath) {
+        this.fileName = fileName;
+        this.templateFilePath = templateFilePath;
+    }
+
     public String resolveStr(String orginStr, String replaceContent) {
 
         Objects.requireNonNull(orginStr);
@@ -162,6 +167,11 @@ public class FileGenrator implements Generator {
     @Override
     public String getPath() {
         return filePath;
+    }
+
+    @Override
+    public void setPath(String path) {
+        filePath=path;
     }
 
     public String getFileName() {
