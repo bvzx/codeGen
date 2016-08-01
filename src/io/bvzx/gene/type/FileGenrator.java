@@ -1,9 +1,13 @@
 package io.bvzx.gene.type;
 
 import io.bvzx.gene.Generator;
+import io.bvzx.util.Configure;
+import io.bvzx.util.Logger;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.StringTokenizer;
 
 /**
  * Created by lss on 16-7-29.
@@ -17,6 +21,9 @@ public class FileGenrator implements Generator {
     private String fileName;
     private String filePath;
     private String templateFilePath;
+
+    private Configure configure=new Configure();
+    private Logger logger=Logger.getLogger(this.getClass());
 
     public FileGenrator(String fileName, String filePath, String templateFilePath) {
         this.fileName = fileName;
@@ -60,28 +67,42 @@ public class FileGenrator implements Generator {
             char c = chars[i];
 
             if (endMatch == true) {
-                System.out.println("[成功匹配一次，返回数据]");
+                logger.log("[成功匹配一次，返回数据]");
                 break;
             } else if (c == TOKEN_IDENTIFICATION_CHAR) {
                 tokenMatch = true;
                 tokenpos = i;
-                System.out.println("[当前char为"+c+",index为"+i+"匹配token]");
+                logger.log("[当前char为"+c+",index为"+i+"匹配token]");
             } else if (c == START_IDENTIFICATION_CHAR && tokenMatch && tokenpos + 1 == i) {
                 startMatch = true;
                 start = i - 1;
-                System.out.println("[当前char为"+c+",index为"+i+"匹配start]");
+                logger.log("[当前char为"+c+",index为"+i+"匹配start]");
             } else if (c == END_IDENTIFICATION_CHAR && startMatch == true) {
                 endMatch = true;
                 end = i + 1;
-                System.out.println("[当前char为"+c+",index为"+i+"匹配end]");
+                logger.log("[当前char为"+c+",index为"+i+"匹配end]");
             } else {
-                System.out.println("[当前char为"+c+",index为"+i+"无匹配]");
+                logger.log("[当前char为"+c+",index为"+i+"无匹配]");
             }
         }
 
         if (endMatch == false) {
-            System.out.println("[结束匹配]");
+            logger.log("[结束匹配]");
             return chars;
+        }else if (endMatch ==true){
+            //char[] matchStr=new char[end-start];
+            //System.arraycopy(chars,start,matchStr,end-start);
+
+            char[] matchStr=Arrays.copyOfRange(chars,start,end);
+
+            String handleStr=new String(matchStr);
+            logger.log("[匹配的字符串是]"+handleStr);
+
+            StringTokenizer stringTokenizer=new StringTokenizer(handleStr,"${}");
+            handleStr=stringTokenizer.nextToken();
+            String replaceStr=configure.getProp(handleStr);
+            logger.log("[替换的字符串是]"+replaceStr);
+            replacechar=replaceStr.toCharArray();
         }
 
         char[] result = new char[chars.length - (end - start) + replacechar.length];
